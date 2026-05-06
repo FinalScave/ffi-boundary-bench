@@ -45,18 +45,26 @@ All platform runners should use the same payload sizes:
 
 README result tables should use Release builds. Debug builds are useful for smoke testing but should not be used for performance comparison.
 
-## Platform Coverage
+## Platform Summary
 
-| Platform | Status | Notes |
-| --- | --- | --- |
-| Native C++ | Implemented | Public C API baseline runner for `BinaryModel` and `u32` |
-| Java 22 FFM | Implemented | `byte[]`, native `MemorySegment`; `BinaryModel` and `u32` |
-| .NET 8 P/Invoke | Implemented | `byte[]`, native memory; `BinaryModel` and `u32` |
-| WebAssembly | Implemented | Emscripten wasm module with Node.js runner; `uint8_array`, wasm heap; `BinaryModel` and `u32` |
-| Android JNI | Implemented | `byte[]`, direct `ByteBuffer`, direct `ByteBuffer` + `FastNative`; `BinaryModel` and `u32` |
-| macOS Swift | Implemented | Apple Swift package + xcframework binaryTarget; `BinaryModel` and `u32` |
-| iOS Swift | Implemented | Apple Swift package + xcframework binaryTarget (`ios-arm64`, `ios-arm64-simulator`); `BinaryModel` and `u32` |
-| HarmonyOS N-API | Implemented | `ArrayBuffer`, external `ArrayBuffer`; `BinaryModel` and `u32` |
+1 MiB average latency in milliseconds. Lower is better. Devices differ by platform, so cross-platform comparisons should be read with the environment notes in each detailed section.
+
+| Platform | Binding | BinaryModel to C API | C API to BinaryModel | u32 to C API | C API to u32 | Notes |
+| --- | --- | ---: | ---: | ---: | ---: | --- |
+| Native C++ | `c_api` | 0.816 | 0.247 | 0.060 | 0.091 | Public C API baseline runner |
+| Java 22 FFM | `byte_array` | 1.821 | 0.806 | 0.174 | 0.350 | JVM heap byte array |
+| Java 22 FFM | `native_memory` | 1.989 | 1.520 | 0.113 | 0.131 | Native `MemorySegment` |
+| .NET 8 P/Invoke | `byte_array` | 6.672 | 6.154 | 0.819 | 0.754 | Managed byte array |
+| .NET 8 P/Invoke | `native_memory` | 5.514 | 6.869 | 0.514 | 0.566 | Native memory buffer |
+| WebAssembly Node.js | `uint8_array` | 4.592 | 8.399 | 0.362 | 0.500 | Wasm C ABI with JS `Uint8Array` copy |
+| WebAssembly Node.js | `wasm_heap` | 4.093 | 7.777 | 0.139 | 0.099 | Wasm C ABI with direct wasm heap access |
+| Android JNI | `byte_array` | 6.126 | 3.365 | 0.853 | 1.131 | JNI `byte[]` |
+| Android JNI | `direct_byte_buffer` | 6.562 | 4.233 | 0.859 | 1.222 | Direct `ByteBuffer` |
+| Android JNI | `direct_byte_buffer_fast_native` | 6.858 | 3.799 | 0.868 | 1.192 | Direct `ByteBuffer` with `FastNative` |
+| macOS Swift | `swift_data` | 1.286 | 2.147 | 0.212 | 0.145 | Swift `Data` |
+| iOS Swift | `swift_data` | 1.227 | 1.312 | 0.122 | 0.060 | Swift `Data` |
+| HarmonyOS N-API | `array_buffer` | 158.465 | 90.167 | 49.979 | 61.907 | N-API `ArrayBuffer` |
+| HarmonyOS N-API | `external_array_buffer` | 137.724 | 89.295 | 50.152 | 50.477 | N-API external `ArrayBuffer` |
 
 ## Latest Results
 
