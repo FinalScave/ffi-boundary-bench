@@ -50,12 +50,12 @@ README result tables should use Release builds. Debug builds are useful for smok
 | Platform | Status | Notes |
 | --- | --- | --- |
 | Native C++ | Implemented | Public C API baseline runner for `BinaryModel` and `u32` |
-| Android JNI | Implemented | `byte[]`, direct `ByteBuffer`, direct `ByteBuffer` + `FastNative`; `BinaryModel` and `u32` |
 | Java 22 FFM | Implemented | `byte[]`, native `MemorySegment`; `BinaryModel` and `u32` |
+| .NET 8 P/Invoke | Implemented | `byte[]`, native memory; `BinaryModel` and `u32` |
+| Android JNI | Implemented | `byte[]`, direct `ByteBuffer`, direct `ByteBuffer` + `FastNative`; `BinaryModel` and `u32` |
 | macOS Swift | Implemented | Apple Swift package + xcframework binaryTarget; `BinaryModel` and `u32` |
 | iOS Swift | Implemented | Apple Swift package + xcframework binaryTarget (`ios-arm64`, `ios-arm64-simulator`); `BinaryModel` and `u32` |
 | HarmonyOS N-API | Implemented | `ArrayBuffer`, external `ArrayBuffer`; `BinaryModel` and `u32` |
-| C# P/Invoke | Planned | No benchmark runner yet |
 | WebAssembly | Planned | No browser/wasm benchmark runner yet |
 
 ## Latest Results
@@ -90,6 +90,93 @@ Environment:
 | `c_api` | `u32_bytes_to_c_api` | `200 KiB` | 1000 | 51200 | 0.009 | 0.008 | 0.025 | 204800 |
 | `c_api` | `u32_sample_to_owned_bytes` | `1 MiB` | 200 | 262144 | 0.091 | 0.062 | 0.222 | 1048576 |
 | `c_api` | `u32_bytes_to_c_api` | `1 MiB` | 200 | 262144 | 0.060 | 0.055 | 0.090 | 1048576 |
+
+### Java 22 FFM Release
+
+Environment:
+
+- Platform: `java22_ffm`
+- Build: `Release`
+- Device: `MacBook M1 Pro`
+- Payload family: `BinaryModel`, `u32`
+
+#### BinaryModel
+
+| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `byte_array` | `java_encode_to_c_api_decode` | `10 KiB` | 5000 | 312 | 0.021 | 0.013 | 2.039 | 10240 |
+| `byte_array` | `c_api_encode_to_java_decode` | `10 KiB` | 5000 | 312 | 0.017 | 0.008 | 1.590 | 10240 |
+| `native_memory` | `java_encode_to_c_api_decode` | `10 KiB` | 5000 | 312 | 0.022 | 0.014 | 0.413 | 10240 |
+| `native_memory` | `c_api_encode_to_java_decode` | `10 KiB` | 5000 | 312 | 0.025 | 0.012 | 1.523 | 10240 |
+| `byte_array` | `java_encode_to_c_api_decode` | `200 KiB` | 1000 | 6207 | 0.278 | 0.253 | 1.990 | 204800 |
+| `byte_array` | `c_api_encode_to_java_decode` | `200 KiB` | 1000 | 6207 | 0.164 | 0.128 | 2.040 | 204800 |
+| `native_memory` | `java_encode_to_c_api_decode` | `200 KiB` | 1000 | 6207 | 0.314 | 0.280 | 2.093 | 204800 |
+| `native_memory` | `c_api_encode_to_java_decode` | `200 KiB` | 1000 | 6207 | 0.294 | 0.241 | 2.070 | 204800 |
+| `byte_array` | `java_encode_to_c_api_decode` | `1 MiB` | 200 | 31777 | 1.821 | 1.346 | 3.845 | 1048576 |
+| `byte_array` | `c_api_encode_to_java_decode` | `1 MiB` | 200 | 31777 | 0.806 | 0.685 | 2.994 | 1048576 |
+| `native_memory` | `java_encode_to_c_api_decode` | `1 MiB` | 200 | 31777 | 1.989 | 1.657 | 3.305 | 1048576 |
+| `native_memory` | `c_api_encode_to_java_decode` | `1 MiB` | 200 | 31777 | 1.520 | 1.299 | 3.012 | 1048576 |
+
+#### u32 Baseline
+
+| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `byte_array` | `java_encode_to_c_api_decode` | `10 KiB` | 5000 | 2560 | 0.002 | 0.001 | 0.161 | 10240 |
+| `byte_array` | `c_api_encode_to_java_decode` | `10 KiB` | 5000 | 2560 | 0.003 | 0.002 | 0.238 | 10240 |
+| `native_memory` | `java_encode_to_c_api_decode` | `10 KiB` | 5000 | 2560 | 0.001 | 0.001 | 0.041 | 10240 |
+| `native_memory` | `c_api_encode_to_java_decode` | `10 KiB` | 5000 | 2560 | 0.002 | 0.001 | 1.598 | 10240 |
+| `byte_array` | `java_encode_to_c_api_decode` | `200 KiB` | 1000 | 51200 | 0.027 | 0.020 | 0.099 | 204800 |
+| `byte_array` | `c_api_encode_to_java_decode` | `200 KiB` | 1000 | 51200 | 0.028 | 0.022 | 1.661 | 204800 |
+| `native_memory` | `java_encode_to_c_api_decode` | `200 KiB` | 1000 | 51200 | 0.015 | 0.013 | 0.047 | 204800 |
+| `native_memory` | `c_api_encode_to_java_decode` | `200 KiB` | 1000 | 51200 | 0.016 | 0.014 | 0.148 | 204800 |
+| `byte_array` | `java_encode_to_c_api_decode` | `1 MiB` | 200 | 262144 | 0.174 | 0.125 | 1.568 | 1048576 |
+| `byte_array` | `c_api_encode_to_java_decode` | `1 MiB` | 200 | 262144 | 0.350 | 0.116 | 3.537 | 1048576 |
+| `native_memory` | `java_encode_to_c_api_decode` | `1 MiB` | 200 | 262144 | 0.113 | 0.081 | 0.316 | 1048576 |
+| `native_memory` | `c_api_encode_to_java_decode` | `1 MiB` | 200 | 262144 | 0.131 | 0.072 | 0.316 | 1048576 |
+
+### .NET 8 P/Invoke Release
+
+Environment:
+
+- Platform: `dotnet8_pinvoke`
+- Build: `Release`
+- Device: `Windows 11, i9-14H`
+- Runtime: `.NET 8`
+- Payload family: `BinaryModel`, `u32`
+
+#### BinaryModel
+
+| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `byte_array` | `dotnet_encode_to_c_api_decode` | `10 KiB` | 5000 | 312 | 0.033 | 0.027 | 2.746 | 10240 |
+| `byte_array` | `c_api_encode_to_dotnet_decode` | `10 KiB` | 5000 | 312 | 0.020 | 0.016 | 1.098 | 10240 |
+| `native_memory` | `dotnet_encode_to_c_api_decode` | `10 KiB` | 5000 | 312 | 0.025 | 0.023 | 0.520 | 10240 |
+| `native_memory` | `c_api_encode_to_dotnet_decode` | `10 KiB` | 5000 | 312 | 0.019 | 0.016 | 0.447 | 10240 |
+| `byte_array` | `dotnet_encode_to_c_api_decode` | `200 KiB` | 1000 | 6207 | 0.818 | 0.518 | 2.332 | 204800 |
+| `byte_array` | `c_api_encode_to_dotnet_decode` | `200 KiB` | 1000 | 6207 | 0.472 | 0.306 | 1.653 | 204800 |
+| `native_memory` | `dotnet_encode_to_c_api_decode` | `200 KiB` | 1000 | 6207 | 0.524 | 0.443 | 1.724 | 204800 |
+| `native_memory` | `c_api_encode_to_dotnet_decode` | `200 KiB` | 1000 | 6207 | 0.466 | 0.300 | 4.291 | 204800 |
+| `byte_array` | `dotnet_encode_to_c_api_decode` | `1 MiB` | 200 | 31777 | 6.672 | 4.336 | 11.400 | 1048576 |
+| `byte_array` | `c_api_encode_to_dotnet_decode` | `1 MiB` | 200 | 31777 | 6.154 | 2.024 | 24.647 | 1048576 |
+| `native_memory` | `dotnet_encode_to_c_api_decode` | `1 MiB` | 200 | 31777 | 5.514 | 3.093 | 10.862 | 1048576 |
+| `native_memory` | `c_api_encode_to_dotnet_decode` | `1 MiB` | 200 | 31777 | 6.869 | 2.392 | 26.426 | 1048576 |
+
+#### u32 Baseline
+
+| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `byte_array` | `dotnet_encode_to_c_api_decode` | `10 KiB` | 5000 | 2560 | 0.001 | 0.001 | 0.122 | 10240 |
+| `byte_array` | `c_api_encode_to_dotnet_decode` | `10 KiB` | 5000 | 2560 | 0.002 | 0.001 | 0.453 | 10240 |
+| `native_memory` | `dotnet_encode_to_c_api_decode` | `10 KiB` | 5000 | 2560 | 0.000 | 0.000 | 0.015 | 10240 |
+| `native_memory` | `c_api_encode_to_dotnet_decode` | `10 KiB` | 5000 | 2560 | 0.001 | 0.001 | 0.108 | 10240 |
+| `byte_array` | `dotnet_encode_to_c_api_decode` | `200 KiB` | 1000 | 51200 | 0.090 | 0.030 | 1.511 | 204800 |
+| `byte_array` | `c_api_encode_to_dotnet_decode` | `200 KiB` | 1000 | 51200 | 0.274 | 0.080 | 1.955 | 204800 |
+| `native_memory` | `dotnet_encode_to_c_api_decode` | `200 KiB` | 1000 | 51200 | 0.031 | 0.027 | 0.153 | 204800 |
+| `native_memory` | `c_api_encode_to_dotnet_decode` | `200 KiB` | 1000 | 51200 | 0.106 | 0.029 | 0.844 | 204800 |
+| `byte_array` | `dotnet_encode_to_c_api_decode` | `1 MiB` | 200 | 262144 | 0.819 | 0.503 | 4.638 | 1048576 |
+| `byte_array` | `c_api_encode_to_dotnet_decode` | `1 MiB` | 200 | 262144 | 0.754 | 0.600 | 1.320 | 1048576 |
+| `native_memory` | `dotnet_encode_to_c_api_decode` | `1 MiB` | 200 | 262144 | 0.514 | 0.477 | 0.654 | 1048576 |
+| `native_memory` | `c_api_encode_to_dotnet_decode` | `1 MiB` | 200 | 262144 | 0.566 | 0.506 | 0.753 | 1048576 |
 
 ### Android Release
 
@@ -146,49 +233,6 @@ Environment:
 | `direct_byte_buffer` | `c_api_encode_to_android_decode` | `1 MiB` | 10 | 262144 | 1.222 | 1.186 | 1.303 | 1048576 |
 | `direct_byte_buffer_fast_native` | `android_encode_to_c_api_decode` | `1 MiB` | 10 | 262144 | 0.868 | 0.837 | 0.907 | 1048576 |
 | `direct_byte_buffer_fast_native` | `c_api_encode_to_android_decode` | `1 MiB` | 10 | 262144 | 1.192 | 1.171 | 1.228 | 1048576 |
-
-### Java 22 FFM Release
-
-Environment:
-
-- Platform: `java22_ffm`
-- Build: `Release`
-- Device: `MacBook M1 Pro`
-- Payload family: `BinaryModel`, `u32`
-
-#### BinaryModel
-
-| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `byte_array` | `java_encode_to_c_api_decode` | `10 KiB` | 5000 | 312 | 0.021 | 0.013 | 2.039 | 10240 |
-| `byte_array` | `c_api_encode_to_java_decode` | `10 KiB` | 5000 | 312 | 0.017 | 0.008 | 1.590 | 10240 |
-| `native_memory` | `java_encode_to_c_api_decode` | `10 KiB` | 5000 | 312 | 0.022 | 0.014 | 0.413 | 10240 |
-| `native_memory` | `c_api_encode_to_java_decode` | `10 KiB` | 5000 | 312 | 0.025 | 0.012 | 1.523 | 10240 |
-| `byte_array` | `java_encode_to_c_api_decode` | `200 KiB` | 1000 | 6207 | 0.278 | 0.253 | 1.990 | 204800 |
-| `byte_array` | `c_api_encode_to_java_decode` | `200 KiB` | 1000 | 6207 | 0.164 | 0.128 | 2.040 | 204800 |
-| `native_memory` | `java_encode_to_c_api_decode` | `200 KiB` | 1000 | 6207 | 0.314 | 0.280 | 2.093 | 204800 |
-| `native_memory` | `c_api_encode_to_java_decode` | `200 KiB` | 1000 | 6207 | 0.294 | 0.241 | 2.070 | 204800 |
-| `byte_array` | `java_encode_to_c_api_decode` | `1 MiB` | 200 | 31777 | 1.821 | 1.346 | 3.845 | 1048576 |
-| `byte_array` | `c_api_encode_to_java_decode` | `1 MiB` | 200 | 31777 | 0.806 | 0.685 | 2.994 | 1048576 |
-| `native_memory` | `java_encode_to_c_api_decode` | `1 MiB` | 200 | 31777 | 1.989 | 1.657 | 3.305 | 1048576 |
-| `native_memory` | `c_api_encode_to_java_decode` | `1 MiB` | 200 | 31777 | 1.520 | 1.299 | 3.012 | 1048576 |
-
-#### u32 Baseline
-
-| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `byte_array` | `java_encode_to_c_api_decode` | `10 KiB` | 5000 | 2560 | 0.002 | 0.001 | 0.161 | 10240 |
-| `byte_array` | `c_api_encode_to_java_decode` | `10 KiB` | 5000 | 2560 | 0.003 | 0.002 | 0.238 | 10240 |
-| `native_memory` | `java_encode_to_c_api_decode` | `10 KiB` | 5000 | 2560 | 0.001 | 0.001 | 0.041 | 10240 |
-| `native_memory` | `c_api_encode_to_java_decode` | `10 KiB` | 5000 | 2560 | 0.002 | 0.001 | 1.598 | 10240 |
-| `byte_array` | `java_encode_to_c_api_decode` | `200 KiB` | 1000 | 51200 | 0.027 | 0.020 | 0.099 | 204800 |
-| `byte_array` | `c_api_encode_to_java_decode` | `200 KiB` | 1000 | 51200 | 0.028 | 0.022 | 1.661 | 204800 |
-| `native_memory` | `java_encode_to_c_api_decode` | `200 KiB` | 1000 | 51200 | 0.015 | 0.013 | 0.047 | 204800 |
-| `native_memory` | `c_api_encode_to_java_decode` | `200 KiB` | 1000 | 51200 | 0.016 | 0.014 | 0.148 | 204800 |
-| `byte_array` | `java_encode_to_c_api_decode` | `1 MiB` | 200 | 262144 | 0.174 | 0.125 | 1.568 | 1048576 |
-| `byte_array` | `c_api_encode_to_java_decode` | `1 MiB` | 200 | 262144 | 0.350 | 0.116 | 3.537 | 1048576 |
-| `native_memory` | `java_encode_to_c_api_decode` | `1 MiB` | 200 | 262144 | 0.113 | 0.081 | 0.316 | 1048576 |
-| `native_memory` | `c_api_encode_to_java_decode` | `1 MiB` | 200 | 262144 | 0.131 | 0.072 | 0.316 | 1048576 |
 
 ### macOS Swift Release
 
