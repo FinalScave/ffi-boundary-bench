@@ -1,0 +1,12 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "ffi-binary-bench OHOS benchmark harness.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "libffibb.so": "file:./src/main/cpp/types/libffibb"
+  }
+}
+

@@ -1,0 +1,22 @@
+plugins {
+  id 'application'
+}
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(22)
+  }
+}
+
+application {
+  mainClass = 'com.ffibb.java22.BenchmarkMain'
+  applicationDefaultJvmArgs = ['--enable-native-access=ALL-UNNAMED']
+}
+
+repositories {
+  mavenCentral()
+}
+
+tasks.withType(JavaExec).configureEach {
+  jvmArgs '--enable-native-access=ALL-UNNAMED'
+}

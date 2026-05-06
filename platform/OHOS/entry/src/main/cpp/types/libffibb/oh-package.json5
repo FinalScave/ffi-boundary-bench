@@ -1,0 +1,6 @@
+{
+  "name": "libffibb.so",
+  "types": "./Index.d.ts",
+  "version": "1.0.0",
+  "description": "Type definitions for the ffi-binary-bench native NAPI module."
+}

@@ -1,0 +1,4 @@
+module FFIBB {
+  header "ffibb/ffibb.h"
+  export *
+}

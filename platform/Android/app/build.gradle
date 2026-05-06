@@ -1,0 +1,66 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+android {
+    namespace 'com.ffibb.android'
+    compileSdk 34
+    ndkVersion '28.2.13676358'
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 34
+        applicationId 'com.ffibb.android'
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_STL=c++_static",
+                          "-DFFIBB_BUILD_NATIVE_BENCH=OFF",
+                          "-DFFIBB_BUILD_WASM_BENCH=OFF"
+            }
+        }
+        ndk {
+            abiFilters "arm64-v8a", "x86_64"
+        }
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            externalNativeBuild {
+                cmake {
+                    arguments "-DCMAKE_BUILD_TYPE=Release",
+                              "-DCMAKE_C_FLAGS_RELEASE=-Os -DNDEBUG -s",
+                              "-DCMAKE_CXX_FLAGS_RELEASE=-Os -DNDEBUG -s"
+                }
+            }
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "../../../CMakeLists.txt"
+        }
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+dependencies {
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
+}
