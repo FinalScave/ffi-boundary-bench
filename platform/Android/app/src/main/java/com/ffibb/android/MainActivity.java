@@ -4,9 +4,12 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,32 +30,89 @@ public final class MainActivity extends Activity {
   private static final String REPORT_LATEST_FILE = "ffibb-benchmark-latest.txt";
   private static final String REPORT_FILE_PREFIX = "ffibb-benchmark-";
   private static final String ERROR_LATEST_FILE = "ffibb-benchmark-error-latest.txt";
+  private static final String READY_REPORT = "Ready to run Android benchmark.";
+
+  private TextView reportView;
+  private Button runButton;
+  private Button copyButton;
+  private String currentReport = READY_REPORT;
+  private boolean running;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    TextView textView = new TextView(this);
-    textView.setText("Running Android benchmark...");
-    textView.setTextIsSelectable(true);
-    textView.setLayoutParams(new ViewGroup.LayoutParams(
+    LinearLayout root = new LinearLayout(this);
+    root.setOrientation(LinearLayout.VERTICAL);
+    root.setPadding(24, 24, 24, 24);
+    root.setLayoutParams(new ViewGroup.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT));
+        ViewGroup.LayoutParams.MATCH_PARENT));
+
+    LinearLayout toolbar = new LinearLayout(this);
+    toolbar.setOrientation(LinearLayout.HORIZONTAL);
+    toolbar.setLayoutParams(new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT,
+        LinearLayout.LayoutParams.WRAP_CONTENT));
+
+    runButton = new Button(this);
+    runButton.setText("Run");
+    runButton.setOnClickListener(view -> runBenchmark());
+    toolbar.addView(runButton, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.WRAP_CONTENT,
+        LinearLayout.LayoutParams.WRAP_CONTENT));
+
+    copyButton = new Button(this);
+    copyButton.setText("Copy");
+    copyButton.setOnClickListener(view -> copyReport());
+    LinearLayout.LayoutParams copyParams = new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.WRAP_CONTENT,
+        LinearLayout.LayoutParams.WRAP_CONTENT);
+    copyParams.leftMargin = 12;
+    toolbar.addView(copyButton, copyParams);
+
+    reportView = new TextView(this);
+    reportView.setTextIsSelectable(true);
+    reportView.setTypeface(Typeface.MONOSPACE);
+    reportView.setTextSize(12);
+    reportView.setText(currentReport);
 
     ScrollView scrollView = new ScrollView(this);
-    scrollView.addView(textView);
-    setContentView(scrollView);
+    scrollView.addView(reportView, new ScrollView.LayoutParams(
+        ScrollView.LayoutParams.MATCH_PARENT,
+        ScrollView.LayoutParams.WRAP_CONTENT));
+
+    LinearLayout.LayoutParams scrollParams = new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT,
+        0,
+        1.0f);
+    scrollParams.topMargin = 12;
+
+    root.addView(toolbar);
+    root.addView(scrollView, scrollParams);
+    setContentView(root);
+
+    setRunning(false);
+  }
+
+  private void runBenchmark() {
+    if (running) {
+      return;
+    }
+
+    updateReport("Running Android benchmark...");
+    setRunning(true);
 
     new Thread(() -> {
       try {
         String report = AndroidBenchmarkRunner.runAll();
         Log.i(TAG, report);
         SavedReport savedReport = saveBenchmarkReport(report);
+        String enrichedReport = appendSavedInfo(report, savedReport);
         runOnUiThread(() -> {
-          copyToClipboard(report);
-          textView.setText(report + "\nSaved latest: " + savedReport.latestFile.getAbsolutePath()
-              + "\nSaved copy: " + savedReport.timestampedFile.getAbsolutePath() + '\n');
-          Toast.makeText(this, "Benchmark result copied and saved", Toast.LENGTH_SHORT).show();
+          updateReport(enrichedReport);
+          setRunning(false);
+          Toast.makeText(this, "Benchmark result saved", Toast.LENGTH_SHORT).show();
         });
       } catch (Throwable throwable) {
         StringWriter stringWriter = new StringWriter();
@@ -62,11 +122,42 @@ public final class MainActivity extends Activity {
         File errorFile = saveBenchmarkError(report);
         runOnUiThread(() -> {
           String suffix = errorFile == null ? "" : "\nSaved error: " + errorFile.getAbsolutePath() + '\n';
-          textView.setText(report + suffix);
+          updateReport(report + suffix);
+          setRunning(false);
           Toast.makeText(this, "Benchmark failed; error saved", Toast.LENGTH_SHORT).show();
         });
       }
     }, "ffibb-benchmark").start();
+  }
+
+  private void copyReport() {
+    if (currentReport.isEmpty()) {
+      return;
+    }
+
+    copyToClipboard(currentReport);
+    Toast.makeText(this, "Benchmark result copied", Toast.LENGTH_SHORT).show();
+  }
+
+  private void updateReport(String report) {
+    currentReport = report;
+    if (reportView != null) {
+      reportView.setText(report);
+    }
+    if (copyButton != null) {
+      copyButton.setEnabled(!report.isEmpty());
+    }
+  }
+
+  private void setRunning(boolean value) {
+    running = value;
+    if (runButton != null) {
+      runButton.setEnabled(!value);
+      runButton.setText(value ? "Running" : "Run");
+    }
+    if (copyButton != null) {
+      copyButton.setEnabled(!currentReport.isEmpty());
+    }
   }
 
   private void copyToClipboard(String report) {
@@ -105,6 +196,11 @@ public final class MainActivity extends Activity {
       throw new IOException("Failed to create report directory: " + directory.getAbsolutePath());
     }
     return directory;
+  }
+
+  private static String appendSavedInfo(String report, SavedReport savedReport) {
+    return report + "\nSaved latest: " + savedReport.latestFile.getAbsolutePath()
+        + "\nSaved copy: " + savedReport.timestampedFile.getAbsolutePath() + '\n';
   }
 
   private static String timestamp() {

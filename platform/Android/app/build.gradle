@@ -30,9 +30,7 @@ android {
             minifyEnabled false
             externalNativeBuild {
                 cmake {
-                    arguments "-DCMAKE_BUILD_TYPE=Release",
-                              "-DCMAKE_C_FLAGS_RELEASE=-Os -DNDEBUG -s",
-                              "-DCMAKE_CXX_FLAGS_RELEASE=-Os -DNDEBUG -s"
+                    arguments "-DCMAKE_BUILD_TYPE=Release"
                 }
             }
         }

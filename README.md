@@ -97,36 +97,55 @@ Environment:
 
 - Platform: `android`
 - Build: `Release`
-- Payload family: `BinaryModel`
-- Device: `Huawei Mate 30 Pro`
+- Payload family: `BinaryModel`, `u32`
+- Device: `iQOO Z9 Turbo`
 - Android: `12`
 
 #### BinaryModel
 
-| Binding | Operation | Case | Iterations | Models | Avg (ms) | Min (ms) | Max (ms) | Bytes |
+| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `byte_array` | `android_encode_to_c_api_decode` | `10 KiB` | 100 | 312 | 0.198 | 0.126 | 0.673 | 10240 |
-| `byte_array` | `c_api_encode_to_android_decode` | `10 KiB` | 100 | 312 | 0.259 | 0.106 | 1.108 | 10240 |
-| `direct_byte_buffer` | `android_encode_to_c_api_decode` | `10 KiB` | 100 | 312 | 0.232 | 0.145 | 5.786 | 10240 |
-| `direct_byte_buffer` | `c_api_encode_to_android_decode` | `10 KiB` | 100 | 312 | 0.173 | 0.131 | 0.395 | 10240 |
-| `direct_byte_buffer_fast_native` | `android_encode_to_c_api_decode` | `10 KiB` | 100 | 312 | 0.197 | 0.118 | 1.043 | 10240 |
-| `direct_byte_buffer_fast_native` | `c_api_encode_to_android_decode` | `10 KiB` | 100 | 312 | 0.121 | 0.115 | 0.176 | 10240 |
-| `byte_array` | `android_encode_to_c_api_decode` | `200 KiB` | 30 | 6207 | 1.959 | 1.735 | 2.547 | 204800 |
-| `byte_array` | `c_api_encode_to_android_decode` | `200 KiB` | 30 | 6207 | 1.454 | 1.393 | 1.738 | 204800 |
-| `direct_byte_buffer` | `android_encode_to_c_api_decode` | `200 KiB` | 30 | 6207 | 2.366 | 2.157 | 3.558 | 204800 |
-| `direct_byte_buffer` | `c_api_encode_to_android_decode` | `200 KiB` | 30 | 6207 | 2.265 | 2.186 | 2.701 | 204800 |
-| `direct_byte_buffer_fast_native` | `android_encode_to_c_api_decode` | `200 KiB` | 30 | 6207 | 2.288 | 2.172 | 2.627 | 204800 |
-| `direct_byte_buffer_fast_native` | `c_api_encode_to_android_decode` | `200 KiB` | 30 | 6207 | 2.324 | 2.171 | 3.002 | 204800 |
-| `byte_array` | `android_encode_to_c_api_decode` | `1 MiB` | 10 | 31777 | 10.432 | 9.410 | 16.387 | 1048576 |
-| `byte_array` | `c_api_encode_to_android_decode` | `1 MiB` | 10 | 31777 | 8.029 | 7.423 | 9.755 | 1048576 |
-| `direct_byte_buffer` | `android_encode_to_c_api_decode` | `1 MiB` | 10 | 31777 | 13.589 | 13.028 | 14.580 | 1048576 |
-| `direct_byte_buffer` | `c_api_encode_to_android_decode` | `1 MiB` | 10 | 31777 | 12.846 | 11.593 | 14.566 | 1048576 |
-| `direct_byte_buffer_fast_native` | `android_encode_to_c_api_decode` | `1 MiB` | 10 | 31777 | 13.975 | 13.008 | 15.388 | 1048576 |
-| `direct_byte_buffer_fast_native` | `c_api_encode_to_android_decode` | `1 MiB` | 10 | 31777 | 13.202 | 11.861 | 14.532 | 1048576 |
+| `byte_array` | `android_encode_to_c_api_decode` | `10 KiB` | 100 | 312 | 0.159 | 0.134 | 0.377 | 10240 |
+| `byte_array` | `c_api_encode_to_android_decode` | `10 KiB` | 100 | 312 | 0.056 | 0.047 | 0.247 | 10240 |
+| `direct_byte_buffer` | `android_encode_to_c_api_decode` | `10 KiB` | 100 | 312 | 0.079 | 0.073 | 0.152 | 10240 |
+| `direct_byte_buffer` | `c_api_encode_to_android_decode` | `10 KiB` | 100 | 312 | 0.060 | 0.039 | 0.542 | 10240 |
+| `direct_byte_buffer_fast_native` | `android_encode_to_c_api_decode` | `10 KiB` | 100 | 312 | 0.067 | 0.055 | 0.606 | 10240 |
+| `direct_byte_buffer_fast_native` | `c_api_encode_to_android_decode` | `10 KiB` | 100 | 312 | 0.039 | 0.036 | 0.068 | 10240 |
+| `byte_array` | `android_encode_to_c_api_decode` | `200 KiB` | 30 | 6207 | 0.910 | 0.882 | 1.009 | 204800 |
+| `byte_array` | `c_api_encode_to_android_decode` | `200 KiB` | 30 | 6207 | 0.602 | 0.585 | 0.669 | 204800 |
+| `direct_byte_buffer` | `android_encode_to_c_api_decode` | `200 KiB` | 30 | 6207 | 1.216 | 1.098 | 1.928 | 204800 |
+| `direct_byte_buffer` | `c_api_encode_to_android_decode` | `200 KiB` | 30 | 6207 | 0.849 | 0.737 | 2.061 | 204800 |
+| `direct_byte_buffer_fast_native` | `android_encode_to_c_api_decode` | `200 KiB` | 30 | 6207 | 1.125 | 1.104 | 1.185 | 204800 |
+| `direct_byte_buffer_fast_native` | `c_api_encode_to_android_decode` | `200 KiB` | 30 | 6207 | 0.761 | 0.735 | 0.909 | 204800 |
+| `byte_array` | `android_encode_to_c_api_decode` | `1 MiB` | 10 | 31777 | 6.126 | 5.045 | 10.532 | 1048576 |
+| `byte_array` | `c_api_encode_to_android_decode` | `1 MiB` | 10 | 31777 | 3.365 | 2.975 | 5.153 | 1048576 |
+| `direct_byte_buffer` | `android_encode_to_c_api_decode` | `1 MiB` | 10 | 31777 | 6.562 | 6.447 | 6.674 | 1048576 |
+| `direct_byte_buffer` | `c_api_encode_to_android_decode` | `1 MiB` | 10 | 31777 | 4.233 | 3.811 | 6.449 | 1048576 |
+| `direct_byte_buffer_fast_native` | `android_encode_to_c_api_decode` | `1 MiB` | 10 | 31777 | 6.858 | 6.432 | 8.109 | 1048576 |
+| `direct_byte_buffer_fast_native` | `c_api_encode_to_android_decode` | `1 MiB` | 10 | 31777 | 3.799 | 3.745 | 3.845 | 1048576 |
 
 #### u32 Baseline
 
-No Android Release u32 baseline result has been captured yet.
+| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `byte_array` | `android_encode_to_c_api_decode` | `10 KiB` | 100 | 2560 | 0.011 | 0.007 | 0.111 | 10240 |
+| `byte_array` | `c_api_encode_to_android_decode` | `10 KiB` | 100 | 2560 | 0.011 | 0.009 | 0.032 | 10240 |
+| `direct_byte_buffer` | `android_encode_to_c_api_decode` | `10 KiB` | 100 | 2560 | 0.009 | 0.009 | 0.009 | 10240 |
+| `direct_byte_buffer` | `c_api_encode_to_android_decode` | `10 KiB` | 100 | 2560 | 0.012 | 0.011 | 0.020 | 10240 |
+| `direct_byte_buffer_fast_native` | `android_encode_to_c_api_decode` | `10 KiB` | 100 | 2560 | 0.009 | 0.009 | 0.031 | 10240 |
+| `direct_byte_buffer_fast_native` | `c_api_encode_to_android_decode` | `10 KiB` | 100 | 2560 | 0.012 | 0.011 | 0.022 | 10240 |
+| `byte_array` | `android_encode_to_c_api_decode` | `200 KiB` | 30 | 51200 | 0.161 | 0.148 | 0.198 | 204800 |
+| `byte_array` | `c_api_encode_to_android_decode` | `200 KiB` | 30 | 51200 | 0.200 | 0.192 | 0.229 | 204800 |
+| `direct_byte_buffer` | `android_encode_to_c_api_decode` | `200 KiB` | 30 | 51200 | 0.170 | 0.167 | 0.196 | 204800 |
+| `direct_byte_buffer` | `c_api_encode_to_android_decode` | `200 KiB` | 30 | 51200 | 0.233 | 0.222 | 0.257 | 204800 |
+| `direct_byte_buffer_fast_native` | `android_encode_to_c_api_decode` | `200 KiB` | 30 | 51200 | 0.169 | 0.168 | 0.183 | 204800 |
+| `direct_byte_buffer_fast_native` | `c_api_encode_to_android_decode` | `200 KiB` | 30 | 51200 | 0.232 | 0.220 | 0.292 | 204800 |
+| `byte_array` | `android_encode_to_c_api_decode` | `1 MiB` | 10 | 262144 | 0.853 | 0.806 | 0.897 | 1048576 |
+| `byte_array` | `c_api_encode_to_android_decode` | `1 MiB` | 10 | 262144 | 1.131 | 1.018 | 1.389 | 1048576 |
+| `direct_byte_buffer` | `android_encode_to_c_api_decode` | `1 MiB` | 10 | 262144 | 0.859 | 0.835 | 0.911 | 1048576 |
+| `direct_byte_buffer` | `c_api_encode_to_android_decode` | `1 MiB` | 10 | 262144 | 1.222 | 1.186 | 1.303 | 1048576 |
+| `direct_byte_buffer_fast_native` | `android_encode_to_c_api_decode` | `1 MiB` | 10 | 262144 | 0.868 | 0.837 | 0.907 | 1048576 |
+| `direct_byte_buffer_fast_native` | `c_api_encode_to_android_decode` | `1 MiB` | 10 | 262144 | 1.192 | 1.171 | 1.228 | 1048576 |
 
 ### Java 22 FFM Release
 
@@ -202,8 +221,6 @@ Environment:
 | `swift_data` | `swift_encode_to_c_api_decode` | `1 MiB` | 10 | 262144 | 0.212 | 0.103 | 0.289 | 1048576 |
 | `swift_data` | `c_api_encode_to_swift_decode` | `1 MiB` | 10 | 262144 | 0.145 | 0.090 | 0.206 | 1048576 |
 
-Sink: `3739585894490921904`
-
 ### iOS Swift Release
 
 Environment:
@@ -233,8 +250,6 @@ Environment:
 | `swift_data` | `c_api_encode_to_swift_decode` | `200 KiB` | 30 | 51200 | 0.029 | 0.028 | 0.029 | 204800 |
 | `swift_data` | `swift_encode_to_c_api_decode` | `1 MiB` | 10 | 262144 | 0.122 | 0.115 | 0.125 | 1048576 |
 | `swift_data` | `c_api_encode_to_swift_decode` | `1 MiB` | 10 | 262144 | 0.060 | 0.057 | 0.064 | 1048576 |
-
-Sink: `3739585894490921904`
 
 ### HarmonyOS N-API Release
 
