@@ -1,0 +1,8 @@
+{
+  "name": "ffibb-emscripten-bench",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "bench": "node src/node_main.js"
+  }
+}

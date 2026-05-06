@@ -52,11 +52,11 @@ README result tables should use Release builds. Debug builds are useful for smok
 | Native C++ | Implemented | Public C API baseline runner for `BinaryModel` and `u32` |
 | Java 22 FFM | Implemented | `byte[]`, native `MemorySegment`; `BinaryModel` and `u32` |
 | .NET 8 P/Invoke | Implemented | `byte[]`, native memory; `BinaryModel` and `u32` |
+| WebAssembly | Implemented | Emscripten wasm module with Node.js runner; `uint8_array`, wasm heap; `BinaryModel` and `u32` |
 | Android JNI | Implemented | `byte[]`, direct `ByteBuffer`, direct `ByteBuffer` + `FastNative`; `BinaryModel` and `u32` |
 | macOS Swift | Implemented | Apple Swift package + xcframework binaryTarget; `BinaryModel` and `u32` |
 | iOS Swift | Implemented | Apple Swift package + xcframework binaryTarget (`ios-arm64`, `ios-arm64-simulator`); `BinaryModel` and `u32` |
 | HarmonyOS N-API | Implemented | `ArrayBuffer`, external `ArrayBuffer`; `BinaryModel` and `u32` |
-| WebAssembly | Planned | No browser/wasm benchmark runner yet |
 
 ## Latest Results
 
@@ -177,6 +177,51 @@ Environment:
 | `byte_array` | `c_api_encode_to_dotnet_decode` | `1 MiB` | 200 | 262144 | 0.754 | 0.600 | 1.320 | 1048576 |
 | `native_memory` | `dotnet_encode_to_c_api_decode` | `1 MiB` | 200 | 262144 | 0.514 | 0.477 | 0.654 | 1048576 |
 | `native_memory` | `c_api_encode_to_dotnet_decode` | `1 MiB` | 200 | 262144 | 0.566 | 0.506 | 0.753 | 1048576 |
+
+### WebAssembly Emscripten Node.js Release
+
+Environment:
+
+- Platform: `wasm_emscripten_node`
+- Build: `Release`
+- Device: `Windows 11, i9-14H`
+- Runtime: `Node.js`
+- Binding API: `wasm_c_abi`
+- Payload family: `BinaryModel`, `u32`
+
+#### BinaryModel
+
+| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `uint8_array` | `js_encode_to_c_api_decode` | `10 KiB` | 5000 | 312 | 0.021 | 0.017 | 0.284 | 10240 |
+| `uint8_array` | `c_api_encode_to_js_decode` | `10 KiB` | 5000 | 312 | 0.040 | 0.033 | 0.317 | 10240 |
+| `wasm_heap` | `js_encode_to_c_api_decode` | `10 KiB` | 5000 | 312 | 0.017 | 0.015 | 0.097 | 10240 |
+| `wasm_heap` | `c_api_encode_to_js_decode` | `10 KiB` | 5000 | 312 | 0.039 | 0.034 | 0.177 | 10240 |
+| `uint8_array` | `js_encode_to_c_api_decode` | `200 KiB` | 1000 | 6207 | 0.403 | 0.342 | 1.372 | 204800 |
+| `uint8_array` | `c_api_encode_to_js_decode` | `200 KiB` | 1000 | 6207 | 0.885 | 0.710 | 2.034 | 204800 |
+| `wasm_heap` | `js_encode_to_c_api_decode` | `200 KiB` | 1000 | 6207 | 0.370 | 0.325 | 1.120 | 204800 |
+| `wasm_heap` | `c_api_encode_to_js_decode` | `200 KiB` | 1000 | 6207 | 0.827 | 0.640 | 2.013 | 204800 |
+| `uint8_array` | `js_encode_to_c_api_decode` | `1 MiB` | 200 | 31777 | 4.592 | 2.104 | 9.084 | 1048576 |
+| `uint8_array` | `c_api_encode_to_js_decode` | `1 MiB` | 200 | 31777 | 8.399 | 5.519 | 18.562 | 1048576 |
+| `wasm_heap` | `js_encode_to_c_api_decode` | `1 MiB` | 200 | 31777 | 4.093 | 2.052 | 5.239 | 1048576 |
+| `wasm_heap` | `c_api_encode_to_js_decode` | `1 MiB` | 200 | 31777 | 7.777 | 3.848 | 18.797 | 1048576 |
+
+#### u32 Baseline
+
+| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `uint8_array` | `js_encode_to_c_api_decode` | `10 KiB` | 5000 | 2560 | 0.004 | 0.001 | 0.212 | 10240 |
+| `uint8_array` | `c_api_encode_to_js_decode` | `10 KiB` | 5000 | 2560 | 0.005 | 0.001 | 0.215 | 10240 |
+| `wasm_heap` | `js_encode_to_c_api_decode` | `10 KiB` | 5000 | 2560 | 0.001 | 0.000 | 0.030 | 10240 |
+| `wasm_heap` | `c_api_encode_to_js_decode` | `10 KiB` | 5000 | 2560 | 0.001 | 0.000 | 0.087 | 10240 |
+| `uint8_array` | `js_encode_to_c_api_decode` | `200 KiB` | 1000 | 51200 | 0.115 | 0.042 | 3.416 | 204800 |
+| `uint8_array` | `c_api_encode_to_js_decode` | `200 KiB` | 1000 | 51200 | 0.194 | 0.049 | 3.912 | 204800 |
+| `wasm_heap` | `js_encode_to_c_api_decode` | `200 KiB` | 1000 | 51200 | 0.026 | 0.022 | 0.092 | 204800 |
+| `wasm_heap` | `c_api_encode_to_js_decode` | `200 KiB` | 1000 | 51200 | 0.024 | 0.021 | 0.294 | 204800 |
+| `uint8_array` | `js_encode_to_c_api_decode` | `1 MiB` | 200 | 262144 | 0.362 | 0.297 | 2.926 | 1048576 |
+| `uint8_array` | `c_api_encode_to_js_decode` | `1 MiB` | 200 | 262144 | 0.500 | 0.441 | 0.808 | 1048576 |
+| `wasm_heap` | `js_encode_to_c_api_decode` | `1 MiB` | 200 | 262144 | 0.139 | 0.125 | 0.166 | 1048576 |
+| `wasm_heap` | `c_api_encode_to_js_decode` | `1 MiB` | 200 | 262144 | 0.099 | 0.090 | 0.223 | 1048576 |
 
 ### Android Release
 

@@ -105,14 +105,21 @@ if (FFIBB_BUILD_NATIVE_BENCH)
 endif ()
 
 if (EMSCRIPTEN AND FFIBB_BUILD_WASM_BENCH)
-  add_executable(ffibb_wasm_bench platform/Emscripten/ffibb_wasm_bindings.cpp)
+  add_executable(ffibb_wasm_bench
+      platform/Emscripten/ffibb_wasm_bindings.cpp
+      src/c_api/ffibb_c_api.cpp
+  )
   target_link_libraries(ffibb_wasm_bench PRIVATE ffibb_core)
   target_include_directories(ffibb_wasm_bench PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
   ffibb_apply_warnings(ffibb_wasm_bench)
   target_link_options(ffibb_wasm_bench PRIVATE
       "-sWASM=1"
       "-sALLOW_MEMORY_GROWTH=1"
-      "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
+      "-sMODULARIZE=1"
+      "-sEXPORT_NAME=createFfibbWasmBench"
+      "-sENVIRONMENT=web,node"
+      "-sEXPORTED_FUNCTIONS=['_malloc','_free','_ffibb_wasm_owned_bytes_struct_size','_ffibb_wasm_owned_bytes_data','_ffibb_wasm_owned_bytes_size','_ffibb_wasm_free_bytes','_ffibb_wasm_process_u32_bytes','_ffibb_wasm_process_binary_model_bytes','_ffibb_wasm_build_sample_u32_bytes','_ffibb_wasm_build_sample_binary_model_bytes']"
+      "-sEXPORTED_RUNTIME_METHODS=['HEAPU8','HEAPU32']"
   )
 endif ()
 
