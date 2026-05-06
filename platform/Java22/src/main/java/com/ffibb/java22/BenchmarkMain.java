@@ -508,6 +508,7 @@ public final class BenchmarkMain {
       List<Path> candidates = List.of(
           cwd.resolve("../../build/native-release/lib").resolve(libraryName),
           cwd.resolve("../../cmake-build-release/lib").resolve(libraryName),
+          cwd.resolve("../../cmake-build-release/bin").resolve(libraryName),
           cwd.resolve("build/native-release/lib").resolve(libraryName),
           cwd.resolve("cmake-build-release/lib").resolve(libraryName),
           cwd.resolve("cmake-build-debug/lib").resolve(libraryName));
