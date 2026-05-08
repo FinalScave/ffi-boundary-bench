@@ -7,20 +7,20 @@ This runner builds the shared C API into an Emscripten module and measures JavaS
 From the repository root:
 
 ```powershell
-emcmake cmake -S . -B build/emscripten -DCMAKE_BUILD_TYPE=Release -DFFIBB_BUILD_SHARED=OFF -DFFIBB_BUILD_NATIVE_BENCH=OFF
-cmake --build build/emscripten --target ffibb_wasm_bench --config Release
+emcmake cmake -S . -B build/emscripten-node -DCMAKE_BUILD_TYPE=Release -DFFIBB_BUILD_SHARED=OFF -DFFIBB_BUILD_NATIVE_BENCH=OFF -DFFIBB_WASM_FLAVOR=node
+cmake --build build/emscripten-node --target ffibb_wasm_bench --config Release
 ```
 
 ## Run
 
 ```powershell
-node platform/Emscripten/src/node_main.js --module build/emscripten/bin/ffibb_wasm_bench.js
+node platform/Emscripten/src/node_main.js --module build/emscripten-node/bin/ffibb_wasm_bench.js
 ```
 
 Optional JSON output:
 
 ```powershell
-node platform/Emscripten/src/node_main.js --module build/emscripten/bin/ffibb_wasm_bench.js --json build/emscripten/results.json
+node platform/Emscripten/src/node_main.js --module build/emscripten-node/bin/ffibb_wasm_bench.js --json build/emscripten-node/results.json
 ```
 
 ## Bindings

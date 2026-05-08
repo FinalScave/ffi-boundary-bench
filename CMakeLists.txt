@@ -20,6 +20,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(FFIBB_BUILD_SHARED "Build the shared C API library" ON)
 option(FFIBB_BUILD_NATIVE_BENCH "Build the native benchmark runner" ON)
 option(FFIBB_BUILD_WASM_BENCH "Build the WebAssembly benchmark target when using Emscripten" ON)
+set(FFIBB_WASM_FLAVOR "node" CACHE STRING "WebAssembly benchmark flavor when using Emscripten: node or standalone")
+set_property(CACHE FFIBB_WASM_FLAVOR PROPERTY STRINGS node standalone)
 
 function(ffibb_apply_warnings target_name)
   if (MSVC)
@@ -105,22 +107,46 @@ if (FFIBB_BUILD_NATIVE_BENCH)
 endif ()
 
 if (EMSCRIPTEN AND FFIBB_BUILD_WASM_BENCH)
-  add_executable(ffibb_wasm_bench
+  string(TOLOWER "${FFIBB_WASM_FLAVOR}" FFIBB_WASM_FLAVOR_NORMALIZED)
+  if ("${FFIBB_WASM_FLAVOR_NORMALIZED}" STREQUAL "node")
+    set(FFIBB_WASM_TARGET ffibb_wasm_bench)
+  elseif ("${FFIBB_WASM_FLAVOR_NORMALIZED}" STREQUAL "standalone")
+    set(FFIBB_WASM_TARGET ffibb_wasm_cabi)
+  else ()
+    message(FATAL_ERROR "FFIBB_WASM_FLAVOR must be node or standalone.")
+  endif ()
+
+  add_executable(${FFIBB_WASM_TARGET}
       platform/Emscripten/ffibb_wasm_bindings.cpp
       src/c_api/ffibb_c_api.cpp
   )
-  target_link_libraries(ffibb_wasm_bench PRIVATE ffibb_core)
-  target_include_directories(ffibb_wasm_bench PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-  ffibb_apply_warnings(ffibb_wasm_bench)
-  target_link_options(ffibb_wasm_bench PRIVATE
-      "-sWASM=1"
-      "-sALLOW_MEMORY_GROWTH=1"
-      "-sMODULARIZE=1"
-      "-sEXPORT_NAME=createFfibbWasmBench"
-      "-sENVIRONMENT=web,node"
-      "-sEXPORTED_FUNCTIONS=['_malloc','_free','_ffibb_wasm_owned_bytes_struct_size','_ffibb_wasm_owned_bytes_data','_ffibb_wasm_owned_bytes_size','_ffibb_wasm_free_bytes','_ffibb_wasm_process_u32_bytes','_ffibb_wasm_process_binary_model_bytes','_ffibb_wasm_build_sample_u32_bytes','_ffibb_wasm_build_sample_binary_model_bytes']"
-      "-sEXPORTED_RUNTIME_METHODS=['HEAPU8','HEAPU32']"
-  )
+  target_link_libraries(${FFIBB_WASM_TARGET} PRIVATE ffibb_core)
+  target_include_directories(${FFIBB_WASM_TARGET} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+  ffibb_apply_warnings(${FFIBB_WASM_TARGET})
+
+  if ("${FFIBB_WASM_FLAVOR_NORMALIZED}" STREQUAL "node")
+    target_link_options(${FFIBB_WASM_TARGET} PRIVATE
+        "-sWASM=1"
+        "-sALLOW_MEMORY_GROWTH=1"
+        "-sMODULARIZE=1"
+        "-sEXPORT_NAME=createFfibbWasmBench"
+        "-sENVIRONMENT=web,node"
+        "-sEXPORTED_FUNCTIONS=['_malloc','_free','_ffibb_wasm_owned_bytes_struct_size','_ffibb_wasm_owned_bytes_data','_ffibb_wasm_owned_bytes_size','_ffibb_wasm_free_bytes','_ffibb_wasm_process_u32_bytes','_ffibb_wasm_process_binary_model_bytes','_ffibb_wasm_build_sample_u32_bytes','_ffibb_wasm_build_sample_binary_model_bytes']"
+        "-sEXPORTED_RUNTIME_METHODS=['HEAPU8','HEAPU32']"
+    )
+  else ()
+    set_target_properties(${FFIBB_WASM_TARGET} PROPERTIES
+        OUTPUT_NAME ffibb_wasm_cabi
+        SUFFIX ".wasm"
+    )
+    target_link_options(${FFIBB_WASM_TARGET} PRIVATE
+        "-sSTANDALONE_WASM=1"
+        "-sWASM=1"
+        "-sERROR_ON_UNDEFINED_SYMBOLS=1"
+        "--no-entry"
+        "-sEXPORTED_FUNCTIONS=['_malloc','_free','_ffibb_wasm_owned_bytes_struct_size','_ffibb_wasm_owned_bytes_data','_ffibb_wasm_owned_bytes_size','_ffibb_wasm_free_bytes','_ffibb_wasm_process_u32_bytes','_ffibb_wasm_process_binary_model_bytes','_ffibb_wasm_build_sample_u32_bytes','_ffibb_wasm_build_sample_binary_model_bytes']"
+    )
+  endif ()
 endif ()
 
 include(GNUInstallDirs)

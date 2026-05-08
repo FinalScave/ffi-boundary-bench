@@ -19,6 +19,7 @@ function candidateModulePaths() {
     paths.push(process.env.FFIBB_WASM_MODULE);
   }
   paths.push(
+    path.join(root, "build", "emscripten-node", "bin", "ffibb_wasm_bench.js"),
     path.join(root, "build", "emscripten", "bin", "ffibb_wasm_bench.js"),
     path.join(root, "cmake-build-emscripten", "bin", "ffibb_wasm_bench.js"),
     path.join(root, "platform", "Emscripten", "dist", "ffibb_wasm_bench.js"),

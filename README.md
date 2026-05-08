@@ -58,6 +58,10 @@ README result tables should use Release builds. Debug builds are useful for smok
 | .NET 8 P/Invoke | `native_memory` | 5.514 | 6.869 | 0.514 | 0.566 | Native memory buffer |
 | WebAssembly Node.js | `uint8_array` | 4.592 | 8.399 | 0.362 | 0.500 | Wasm C ABI with JS `Uint8Array` copy |
 | WebAssembly Node.js | `wasm_heap` | 4.093 | 7.777 | 0.139 | 0.099 | Wasm C ABI with direct wasm heap access |
+| JVM Wasm GraalWasm | `byte_array` | 161.761 | 13.710 | 35.847 | 0.591 | Wasm C ABI with JVM byte array copy, JVMCI disabled |
+| JVM Wasm GraalWasm | `wasm_memory` | 141.922 | 18.301 | 10.090 | 9.749 | Wasm C ABI with direct GraalWasm memory access, JVMCI disabled |
+| JVM Wasm Chicory | `byte_array` | 194.047 | 20.088 | 0.250 | 0.440 | Wasm C ABI with JVM byte array copy |
+| JVM Wasm Chicory | `wasm_memory` | 192.870 | 20.306 | 0.831 | 0.558 | Wasm C ABI with direct Chicory memory access |
 | Android JNI | `byte_array` | 6.126 | 3.365 | 0.853 | 1.131 | JNI `byte[]` |
 | Android JNI | `direct_byte_buffer` | 6.562 | 4.233 | 0.859 | 1.222 | Direct `ByteBuffer` |
 | Android JNI | `direct_byte_buffer_fast_native` | 6.858 | 3.799 | 0.868 | 1.192 | Direct `ByteBuffer` with `FastNative` |
@@ -230,6 +234,99 @@ Environment:
 | `uint8_array` | `c_api_encode_to_js_decode` | `1 MiB` | 200 | 262144 | 0.500 | 0.441 | 0.808 | 1048576 |
 | `wasm_heap` | `js_encode_to_c_api_decode` | `1 MiB` | 200 | 262144 | 0.139 | 0.125 | 0.166 | 1048576 |
 | `wasm_heap` | `c_api_encode_to_js_decode` | `1 MiB` | 200 | 262144 | 0.099 | 0.090 | 0.223 | 1048576 |
+
+### JVM Wasm GraalWasm Release
+
+Environment:
+
+- Platform: `jvm_wasm_graalwasm`
+- Build: `Release`
+- Device: `Windows 11, i9-14H`
+- JVM: `Corretto 25.0.2`
+- Runtime: `GraalWasm 25.0.2`
+- Runtime compilation: `JVMCI disabled`
+- Binding API: `wasm_c_abi`
+- Payload family: `BinaryModel`, `u32`
+
+#### BinaryModel
+
+| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `byte_array` | `jvm_encode_to_wasm_c_api_decode` | `10 KiB` | 5000 | 312 | 1.382 | 1.165 | 4.137 | 10240 |
+| `byte_array` | `wasm_c_api_encode_to_jvm_decode` | `10 KiB` | 5000 | 312 | 0.178 | 0.132 | 2.545 | 10240 |
+| `wasm_memory` | `jvm_encode_to_wasm_c_api_decode` | `10 KiB` | 5000 | 312 | 1.435 | 1.227 | 3.631 | 10240 |
+| `wasm_memory` | `wasm_c_api_encode_to_jvm_decode` | `10 KiB` | 5000 | 312 | 0.191 | 0.169 | 1.951 | 10240 |
+| `byte_array` | `jvm_encode_to_wasm_c_api_decode` | `200 KiB` | 1000 | 6207 | 29.984 | 27.804 | 43.275 | 204800 |
+| `byte_array` | `wasm_c_api_encode_to_jvm_decode` | `200 KiB` | 1000 | 6207 | 2.634 | 2.370 | 4.317 | 204800 |
+| `wasm_memory` | `jvm_encode_to_wasm_c_api_decode` | `200 KiB` | 1000 | 6207 | 28.277 | 25.915 | 48.337 | 204800 |
+| `wasm_memory` | `wasm_c_api_encode_to_jvm_decode` | `200 KiB` | 1000 | 6207 | 3.655 | 3.193 | 6.559 | 204800 |
+| `byte_array` | `jvm_encode_to_wasm_c_api_decode` | `1 MiB` | 200 | 31777 | 161.761 | 140.453 | 298.541 | 1048576 |
+| `byte_array` | `wasm_c_api_encode_to_jvm_decode` | `1 MiB` | 200 | 31777 | 13.710 | 12.890 | 16.805 | 1048576 |
+| `wasm_memory` | `jvm_encode_to_wasm_c_api_decode` | `1 MiB` | 200 | 31777 | 141.922 | 133.737 | 189.316 | 1048576 |
+| `wasm_memory` | `wasm_c_api_encode_to_jvm_decode` | `1 MiB` | 200 | 31777 | 18.301 | 17.195 | 22.336 | 1048576 |
+
+#### u32 Baseline
+
+| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `byte_array` | `jvm_encode_to_wasm_c_api_decode` | `10 KiB` | 5000 | 2560 | 0.349 | 0.300 | 2.363 | 10240 |
+| `byte_array` | `wasm_c_api_encode_to_jvm_decode` | `10 KiB` | 5000 | 2560 | 0.019 | 0.013 | 0.313 | 10240 |
+| `wasm_memory` | `jvm_encode_to_wasm_c_api_decode` | `10 KiB` | 5000 | 2560 | 0.119 | 0.092 | 2.039 | 10240 |
+| `wasm_memory` | `wasm_c_api_encode_to_jvm_decode` | `10 KiB` | 5000 | 2560 | 0.107 | 0.089 | 1.814 | 10240 |
+| `byte_array` | `jvm_encode_to_wasm_c_api_decode` | `200 KiB` | 1000 | 51200 | 6.853 | 5.988 | 9.896 | 204800 |
+| `byte_array` | `wasm_c_api_encode_to_jvm_decode` | `200 KiB` | 1000 | 51200 | 0.084 | 0.064 | 1.474 | 204800 |
+| `wasm_memory` | `jvm_encode_to_wasm_c_api_decode` | `200 KiB` | 1000 | 51200 | 1.941 | 1.675 | 3.730 | 204800 |
+| `wasm_memory` | `wasm_c_api_encode_to_jvm_decode` | `200 KiB` | 1000 | 51200 | 1.898 | 1.673 | 4.154 | 204800 |
+| `byte_array` | `jvm_encode_to_wasm_c_api_decode` | `1 MiB` | 200 | 262144 | 35.847 | 33.096 | 48.624 | 1048576 |
+| `byte_array` | `wasm_c_api_encode_to_jvm_decode` | `1 MiB` | 200 | 262144 | 0.591 | 0.506 | 2.261 | 1048576 |
+| `wasm_memory` | `jvm_encode_to_wasm_c_api_decode` | `1 MiB` | 200 | 262144 | 10.090 | 9.140 | 17.990 | 1048576 |
+| `wasm_memory` | `wasm_c_api_encode_to_jvm_decode` | `1 MiB` | 200 | 262144 | 9.749 | 8.868 | 12.110 | 1048576 |
+
+### JVM Wasm Chicory Release
+
+Environment:
+
+- Platform: `jvm_wasm_chicory`
+- Build: `Release`
+- Device: `Windows 11, i9-14H`
+- JVM: `Corretto 25.0.2`
+- Runtime: `Chicory 1.7.5`
+- Binding API: `wasm_c_abi`
+- Payload family: `BinaryModel`, `u32`
+
+#### BinaryModel
+
+| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `byte_array` | `jvm_encode_to_wasm_c_api_decode` | `10 KiB` | 5000 | 312 | 2.328 | 1.942 | 5.909 | 10240 |
+| `byte_array` | `wasm_c_api_encode_to_jvm_decode` | `10 KiB` | 5000 | 312 | 0.238 | 0.192 | 1.912 | 10240 |
+| `wasm_memory` | `jvm_encode_to_wasm_c_api_decode` | `10 KiB` | 5000 | 312 | 2.158 | 1.854 | 5.291 | 10240 |
+| `wasm_memory` | `wasm_c_api_encode_to_jvm_decode` | `10 KiB` | 5000 | 312 | 0.253 | 0.210 | 2.069 | 10240 |
+| `byte_array` | `jvm_encode_to_wasm_c_api_decode` | `200 KiB` | 1000 | 6207 | 41.726 | 37.290 | 65.358 | 204800 |
+| `byte_array` | `wasm_c_api_encode_to_jvm_decode` | `200 KiB` | 1000 | 6207 | 4.037 | 3.464 | 7.164 | 204800 |
+| `wasm_memory` | `jvm_encode_to_wasm_c_api_decode` | `200 KiB` | 1000 | 6207 | 39.931 | 36.816 | 46.991 | 204800 |
+| `wasm_memory` | `wasm_c_api_encode_to_jvm_decode` | `200 KiB` | 1000 | 6207 | 4.044 | 3.579 | 6.266 | 204800 |
+| `byte_array` | `jvm_encode_to_wasm_c_api_decode` | `1 MiB` | 200 | 31777 | 194.047 | 184.863 | 214.739 | 1048576 |
+| `byte_array` | `wasm_c_api_encode_to_jvm_decode` | `1 MiB` | 200 | 31777 | 20.088 | 18.575 | 23.463 | 1048576 |
+| `wasm_memory` | `jvm_encode_to_wasm_c_api_decode` | `1 MiB` | 200 | 31777 | 192.870 | 185.824 | 208.612 | 1048576 |
+| `wasm_memory` | `wasm_c_api_encode_to_jvm_decode` | `1 MiB` | 200 | 31777 | 20.306 | 19.080 | 23.906 | 1048576 |
+
+#### u32 Baseline
+
+| Binding | Operation | Case | Iterations | Elements | Avg (ms) | Min (ms) | Max (ms) | Bytes |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `byte_array` | `jvm_encode_to_wasm_c_api_decode` | `10 KiB` | 5000 | 2560 | 0.012 | 0.010 | 0.132 | 10240 |
+| `byte_array` | `wasm_c_api_encode_to_jvm_decode` | `10 KiB` | 5000 | 2560 | 0.018 | 0.015 | 1.171 | 10240 |
+| `wasm_memory` | `jvm_encode_to_wasm_c_api_decode` | `10 KiB` | 5000 | 2560 | 0.015 | 0.012 | 1.184 | 10240 |
+| `wasm_memory` | `wasm_c_api_encode_to_jvm_decode` | `10 KiB` | 5000 | 2560 | 0.019 | 0.016 | 0.119 | 10240 |
+| `byte_array` | `jvm_encode_to_wasm_c_api_decode` | `200 KiB` | 1000 | 51200 | 0.047 | 0.039 | 0.221 | 204800 |
+| `byte_array` | `wasm_c_api_encode_to_jvm_decode` | `200 KiB` | 1000 | 51200 | 0.087 | 0.078 | 1.718 | 204800 |
+| `wasm_memory` | `jvm_encode_to_wasm_c_api_decode` | `200 KiB` | 1000 | 51200 | 0.136 | 0.090 | 0.331 | 204800 |
+| `wasm_memory` | `wasm_c_api_encode_to_jvm_decode` | `200 KiB` | 1000 | 51200 | 0.111 | 0.093 | 1.473 | 204800 |
+| `byte_array` | `jvm_encode_to_wasm_c_api_decode` | `1 MiB` | 200 | 262144 | 0.250 | 0.222 | 2.254 | 1048576 |
+| `byte_array` | `wasm_c_api_encode_to_jvm_decode` | `1 MiB` | 200 | 262144 | 0.440 | 0.362 | 2.383 | 1048576 |
+| `wasm_memory` | `jvm_encode_to_wasm_c_api_decode` | `1 MiB` | 200 | 262144 | 0.831 | 0.762 | 1.130 | 1048576 |
+| `wasm_memory` | `wasm_c_api_encode_to_jvm_decode` | `1 MiB` | 200 | 262144 | 0.558 | 0.506 | 2.212 | 1048576 |
 
 ### Android Release
 
